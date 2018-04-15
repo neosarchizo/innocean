@@ -1,4 +1,4 @@
-# [DAY 5] 클래스 & 게임 만들기
+# [DAY 5] 클래스
 
 ## 창 크기 설정
 
@@ -46,7 +46,7 @@ def setup():
     size(400, 600)
     background(255)
     strokeWeight(8)
-    
+
 def draw():
     point(x, y)
 ```
@@ -64,7 +64,7 @@ y = 0
 point(x, y)
 ```
 
-여기에 `x`, `y`는 지역 변수로서 설정이 되어있다.
+여기에 `x`, `y`는 지역 변수로서 설정이 되어있다.
 
 ```python
 x = 200
@@ -74,13 +74,13 @@ def setup():
     size(400, 600)
     background(255)
     strokeWeight(8)
-    
+
 def draw():
-  	global x, y
+      global x, y
     point(x, y)
 ```
 
-위와 같이 `global x, y`처럼 입력해야 전역 변수를 사용할 수 있다.
+위와 같이 `global x, y`처럼 입력해야 전역 변수를 사용할 수 있다.
 
 ### 빗방울의 좌표가 계속 아래로 내려가게 만들기
 
@@ -92,7 +92,7 @@ def setup():
     size(400, 600)
     background(255)
     strokeWeight(8)
-    
+
 def draw():
     global x, y
     y = y + 1
@@ -108,7 +108,7 @@ y = 0
 def setup():
     size(400, 600)
     strokeWeight(8)
-    
+
 def draw():
     background(255)
     global x, y
@@ -124,7 +124,7 @@ rain = PVector(200, 0)
 def setup():
     size(400, 600)
     strokeWeight(8)
-    
+
 def draw():
     background(255)
     global rain
@@ -132,7 +132,7 @@ def draw():
     point(rain.x, rain.y)
 ```
 
-프로세싱의 `PVector`를 이용해 쉽게 좌표 정보를 관리할 수 있다.
+프로세싱의 `PVector`를 이용해 쉽게 좌표 정보를 관리할 수 있다.
 
 ```python
 rain = PVector(200, 0)
@@ -140,7 +140,7 @@ rain = PVector(200, 0)
 def setup():
     size(400, 600)
     strokeWeight(8)
-    
+
 def draw():
     background(255)
     global rain
@@ -158,7 +158,7 @@ rain = PVector(200, 0)
 def setup():
     size(400, 600)
     strokeWeight(8)
-    
+
 def draw():
     background(255)
     global rain
@@ -178,7 +178,7 @@ rain = PVector(200, 0)
 def setup():
     size(400, 600)
     strokeWeight(8)
-    
+
 def draw():
     background(255)
     global rain
@@ -190,4 +190,327 @@ def draw():
     point(rain.x, rain.y)
 ```
 
+## 클래스 만들기
 
+![day5_00](img/day5_00.jpg)
+
+위와 같이 탭 아이콘을 클릭한다.
+
+![day5_01](img/day5_01.jpg)
+
+메뉴에서 `새 탭`을 선택한다.
+
+![day5_02](img/day5_02.jpg)
+
+파일 이름을 `rain.py`라고 설정한다.
+
+```python
+class Rain:
+    def __init__(self, name):
+        self.name = name
+```
+
+`rain.py`의 코드를 위와 같이 작성한다. 위 내용은 `Rain`이라는 클래스를 만든다는 뜻이다.
+
+```python
+from rain import *
+
+rn = Rain('JH')
+print(rn.name)
+
+def setup():
+    size(400, 600)
+    strokeWeight(8)
+
+def draw():
+    background(255)
+```
+
+메인 코드를 위와 같이 수정한다.  `from rain import *`은 `rain`모듈에서 함수나 클래스를 모두 불러온다는 뜻이다.
+
+## Rain 클래스에 좌표 정보 넣기
+
+### rain.py
+
+```python
+class Rain:
+    def __init__(self, x):
+        self.pos = PVector(x, 0)
+```
+
+### 메인
+
+```python
+from rain import *
+import random
+
+rn = Rain(200)
+
+def setup():
+    size(400, 600)
+    strokeWeight(8)
+
+def draw():
+    background(255)
+    global rn
+    rn.pos.y = rn.pos.y + 5
+    if rn.pos.y > height:
+        rn.pos.y = 0
+        x = random.randrange(0, width)
+        rn.pos.x = x
+    point(rn.pos.x, rn.pos.y)
+```
+
+## Rain 클래스에 display 명령어 추가하기
+
+### rain.py
+
+```python
+import random
+
+class Rain:
+    def __init__(self, x):
+        self.pos = PVector(x, 0)
+
+    def display(self):
+        self.pos.y = self.pos.y + 5
+        if self.pos.y > height:
+            self.pos.y = 0
+            x = random.randrange(0, width)
+            self.pos.x = x
+        point(self.pos.x, self.pos.y)
+```
+
+### 메인
+
+```python
+from rain import *
+
+rn = Rain(200)
+
+def setup():
+    size(400, 600)
+    strokeWeight(8)
+
+def draw():
+    background(255)
+    global rn
+    rn.display()
+```
+
+## 빗방울 여러개 만들기
+
+### 메인
+
+```python
+from rain import *
+
+rains = []
+
+def setup():
+    size(400, 600)
+    strokeWeight(8)
+    global rains
+    rains.append(Rain(100))
+    rains.append(Rain(200))
+    rains.append(Rain(300))
+
+def draw():
+    background(255)
+    global rains
+    for r in rains:
+        r.display()
+```
+
+## 빗방울의 시작 위치를 다르게 하기
+
+### rain.py
+
+```python
+import random
+
+class Rain:
+    def __init__(self):
+        x = random.randrange(0, width)
+        y = random.randrange(0, height)
+        self.pos = PVector(x, y)
+
+    def display(self):
+        self.pos.y = self.pos.y + 5
+        if self.pos.y > height:
+            self.pos.y = 0
+            x = random.randrange(0, width)
+            self.pos.x = x
+        point(self.pos.x, self.pos.y)
+```
+
+### 메인
+
+```python
+from rain import *
+
+rains = []
+
+def setup():
+    size(400, 600)
+    strokeWeight(2)
+    global rains
+    for n in range(0, 100):
+        rains.append(Rain())
+
+def draw():
+    background(255)
+    global rains
+    for r in rains:
+        r.display()
+```
+
+## 빗방울의 속도를 다르게 하기
+
+### rain.py
+
+```python
+import random
+
+class Rain:
+    def __init__(self):
+        x = random.randrange(0, width)
+        y = random.randrange(0, height)
+        v = random.randrange(5, 11)
+        self.pos = PVector(x, y)
+        self.velocity = v
+
+    def display(self):
+        self.pos.y = self.pos.y + self.velocity
+        if self.pos.y > height:
+            self.pos.y = 0
+            x = random.randrange(0, width)
+            self.pos.x = x
+        point(self.pos.x, self.pos.y)
+```
+
+### 메인
+
+```python
+from rain import *
+
+rains = []
+
+def setup():
+    size(400, 600)
+    strokeWeight(2)
+    global rains
+    for n in range(0, 100):
+        rains.append(Rain())
+
+def draw():
+    background(255)
+    global rains
+    for r in rains:
+        r.display()
+```
+
+## 빗방울의 굵기를 다르게 하기
+
+### rain.py
+
+```python
+import random
+
+class Rain:
+    def __init__(self):
+        x = random.randrange(0, width)
+        y = random.randrange(0, height)
+        v = random.randrange(5, 11)
+        w = random.randrange(1, 5)
+        self.pos = PVector(x, y)
+        self.velocity = v
+        self.weight = w
+
+    def display(self):
+        self.pos.y = self.pos.y + self.velocity
+        if self.pos.y > height:
+            self.pos.y = 0
+            x = random.randrange(0, width)
+            self.pos.x = x
+
+        strokeWeight(self.weight)
+        point(self.pos.x, self.pos.y)
+```
+
+### 메인
+
+```python
+from rain import *
+
+rains = []
+
+def setup():
+    size(400, 600)
+    global rains
+    for n in range(0, 100):
+        rains.append(Rain())
+
+def draw():
+    background(255)
+    global rains
+    for r in rains:
+        r.display()
+```
+
+## 빗방울의 색을 다르게 하기
+
+### rain.py
+
+```python
+import random
+
+class Rain:
+    def __init__(self):
+        x = random.randrange(0, width)
+        y = random.randrange(0, height)
+        v = random.randrange(5, 11)
+        w = random.randrange(1, 5)
+        r = random.randrange(0, 10)
+        g = random.randrange(0, 80)
+        b = random.randrange(200, 256)
+        a = random.randrange(50, 150)
+        self.pos = PVector(x, y)
+        self.velocity = v
+        self.weight = w
+        self.color = [r, g, b, a]
+
+    def display(self):
+        self.pos.y = self.pos.y + self.velocity
+        if self.pos.y > height:
+            self.pos.y = 0
+            x = random.randrange(0, width)
+            self.pos.x = x
+
+        strokeWeight(self.weight)
+        stroke(self.color[0], self.color[1], self.color[2], self.color[3])
+        point(self.pos.x, self.pos.y)
+```
+
+### 메인
+
+```python
+from rain import *
+
+rains = []
+
+def setup():
+    size(400, 600)
+    global rains
+    for n in range(0, 100):
+        rains.append(Rain())
+
+def draw():
+    background(255)
+    global rains
+    for r in rains:
+        r.display()
+```
+## Mission
+
+빗방울 프로그램을 재미있게 수정해보기
