@@ -30,7 +30,7 @@ def draw():
 
 ## 마우스에 맞춰 플레이어 움직이기
 
-```pytho
+```python
 def setup():
     size(600, 400)
     
