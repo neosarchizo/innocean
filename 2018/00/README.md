@@ -6,3 +6,4 @@
 - [[DAY 3] 챗봇 만들기](day3.md)  
 - [[DAY 4] 함수 & 프로세싱](day4.md)  
 - [[DAY 5] 클래스](day5.md)  
+- [[DAY 6] 게임 만들기](day6.md)  
