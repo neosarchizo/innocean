@@ -1,5 +1,7 @@
 # [DAY 7] 웹 자료 받기
 
+input dialog
+
 ## 파일 읽기
 
 ```python
@@ -61,3 +63,22 @@ with open('test.txt', 'a') as f:
 ```
 
 `open('test.txt', 'a')`와 같이 입력하면 내용을 기존 파일 맨 뒤에 덧 붙인다.
+
+
+
+## 파일 다운로드
+
+`atom`을 열고 다음과 같이 입력한다.
+
+```python
+import urllib.request
+import shutil
+
+with urllib.request.urlopen('http://www.innocean.com/imgs/img_logo.svg') as response:
+    with open('a.svg', 'wb') as out_file:
+        shutil.copyfileobj(response, out_file)
+```
+
+`urllib.request`이 웹에서 데이터를 받을때 사용하는 모듈이고, `shutil`이 파일을 저장할때 사용하는 모듈이다.
+
+
