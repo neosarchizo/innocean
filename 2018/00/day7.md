@@ -81,4 +81,74 @@ with urllib.request.urlopen('http://www.innocean.com/imgs/img_logo.svg') as resp
 
 `urllib.request`이 웹에서 데이터를 받을때 사용하는 모듈이고, `shutil`이 파일을 저장할때 사용하는 모듈이다.
 
+## Yahoo Weather API
 
+[https://developer.yahoo.com/weather/](https://developer.yahoo.com/weather/) 에 접속한다.
+
+설정을 통해 서울의 날씨 정보를 얻을 수 있다.
+
+```python
+import urllib.request
+
+with urllib.request.urlopen('https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22seoul%2C%20ko%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys') as response:
+    text = response.read()
+    print(text)
+```
+
+위와 같이 실행하면 날씨 정보에 대한 JSON을 받아서 출력한다.
+
+```python
+import urllib.request
+import json
+
+with urllib.request.urlopen('https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22seoul%2C%20ko%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys') as response:
+    text = response.read()
+    print(text)
+    j = json.loads(text)
+```
+
+`json` 모듈을 추가해 파이썬에서 json을 제어할 수 있다.
+
+## Dialog로 입력 값 받기
+
+```python
+from tkinter import *
+
+class InputDialog(object):
+
+    def __init__(self,requestMessage):
+        self.root = Tk()
+        self.string = ''
+        self.frame = Frame(self.root)
+        self.frame.pack()
+        self.acceptInput(requestMessage)
+
+    def acceptInput(self,requestMessage):
+        r = self.frame
+        self.e = Entry(r,text='Name')
+        self.e.pack(side='left')
+        self.e.focus_set()
+        k = Label(r,text=requestMessage)
+        k.pack(side='left')
+        b = Button(r,text='okay',command=self.gettext)
+        b.pack(side='right')
+
+    def gettext(self):
+        self.string = self.e.get()
+        self.root.destroy()
+
+    def getString(self):
+        return self.string
+
+    def waitForInput(self):
+        self.root.mainloop()
+
+def getText(requestMessage):
+    msgBox = InputDialog(requestMessage)
+    #loop until the user makes a decision and the window is destroyed
+    msgBox.waitForInput()
+    return msgBox.getString()
+
+var = getText('enter your name')
+print("Var:" + var)
+```
