@@ -7,3 +7,4 @@
 - [[DAY 4] 함수 & 프로세싱](day4.md)  
 - [[DAY 5] 클래스](day5.md)  
 - [[DAY 6] 게임 만들기](day6.md)  
+- [[DAY 7] 웹 자료 받기](day7.md)  
