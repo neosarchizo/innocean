@@ -1,7 +1,5 @@
 # [DAY 7] 웹 자료 받기
 
-input dialog
-
 ## 파일 읽기
 
 ```python
@@ -81,33 +79,19 @@ with urllib.request.urlopen('http://www.innocean.com/imgs/img_logo.svg') as resp
 
 `urllib.request`이 웹에서 데이터를 받을때 사용하는 모듈이고, `shutil`이 파일을 저장할때 사용하는 모듈이다.
 
-## Yahoo Weather API
-
-[https://developer.yahoo.com/weather/](https://developer.yahoo.com/weather/) 에 접속한다.
-
-설정을 통해 서울의 날씨 정보를 얻을 수 있다.
-
 ```python
 import urllib.request
+import shutil
 
-with urllib.request.urlopen('https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22seoul%2C%20ko%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys') as response:
-    text = response.read()
-    print(text)
+def download_file(url):
+    with urllib.request.urlopen(url) as response:
+        name_parts = url.split('/')
+        with open(name_parts[-1], 'wb') as out_file:
+            shutil.copyfileobj(response, out_file)
+
+download_file('http://digitalspyuk.cdnds.net/18/14/1600x1066/gallery-1522945902-mlu-17652-r.jpg')
+
 ```
-
-위와 같이 실행하면 날씨 정보에 대한 JSON을 받아서 출력한다.
-
-```python
-import urllib.request
-import json
-
-with urllib.request.urlopen('https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22seoul%2C%20ko%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys') as response:
-    text = response.read()
-    print(text)
-    j = json.loads(text)
-```
-
-`json` 모듈을 추가해 파이썬에서 json을 제어할 수 있다.
 
 ## Dialog로 입력 값 받기
 
