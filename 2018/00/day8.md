@@ -67,6 +67,122 @@ python setup.py py2app -A
 
 ## 소리 추가하기
 
+메뉴에서 `스케치` - `내부 라이브러리...` - `라이브러리 추가하기...`선택한다.
+
+`minim`을 검색해서 설치한다. 
+
+### 메인
+
+```python
+from player import *
+from item import *
+
+add_library('minim')
+
+items = []
+
+def setup():
+    global minim, sound
+    minim = Minim(this)
+    sound = minim.loadFile("item.wav", 2048)
+    global player
+    player = Player()
+    global items
+    for n in range(0, 10):
+        items.append(Item())
+    size(600, 400)
+    
+def draw():
+    background(255)
+    global player
+    if player.life == 10:
+        textSize(50)
+        textAlign(CENTER)
+        text("Clear", width/2, height/2)
+        return
+    elif player.life == 0:
+        textSize(50)
+        textAlign(CENTER)
+        text("Failed", width/2, height/2)
+        return
+    
+    player.update()
+    player.display()
+    global sound
+    global items
+    for item in items:
+        item.update(player, sound)
+        item.display()
+    drawLife()
+    
+def drawLife():
+    fill(0)
+    textSize(30)
+    textAlign(LEFT)
+    text("Life : " + str(player.life), 20, 40)
+```
+
+### player.py
+
+```python
+class Player:
+    def __init__(self):
+        self.pos = PVector(width/2, 350)
+        self.life = 5
+
+    def update(self):
+        self.pos.x = mouseX
+
+    def display(self):
+        fill(255)
+        ellipse(self.pos.x, self.pos.y, 50, 50)
+```
+
+### item.py
+
+```python
+import random
+
+class Item:
+    def __init__(self):        
+        self.reset()
+    
+    def reset(self):
+        x = random.randrange(0, width)
+        y = random.randrange(50, height)
+        v = random.randrange(5, 11)
+        m = random.randrange(0, 2)
+        self.pos = PVector(x, -y)
+        self.velocity = v
+        self.mode = m
+        
+    def update(self, player, sound):
+        self.pos.y = self.pos.y + self.velocity
+        
+        if dist(player.pos.x, player.pos.y, self.pos.x, self.pos.y) < 37.5:
+            sound.rewind()
+            sound.play()
+            if self.mode == 0:
+                player.life = player.life + 1
+                if player.life > 10:
+                    player.life = 10
+            elif self.mode == 1:
+                player.life = player.life - 1
+                if player.life < 0:
+                    player.life = 0
+            self.reset()
+        elif self.pos.y > height:
+            self.reset()
+
+    def display(self):
+        if self.mode == 0:
+            fill(0, 0, 255)
+        elif self.mode == 1:
+            fill(255, 0, 0)
+
+        ellipse(self.pos.x, self.pos.y, 25, 25)
+```
+
 ## Yahoo Weather API
 
 [https://developer.yahoo.com/weather/](https://developer.yahoo.com/weather/) 에 접속한다.
