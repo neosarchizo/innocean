@@ -35,7 +35,7 @@ python setup.py py2exe
 
 ### 맥
 
-터미널에서 아래와 같이 입력해 `py2app`을 설치한다.
+터미널에서 아래와 같이 입력해 `py2app`을 설치한다.
 
 ```bash
 pip install py2app
@@ -67,9 +67,9 @@ python setup.py py2app -A
 
 ## 소리 추가하기
 
-메뉴에서 `스케치` - `내부 라이브러리...` - `라이브러리 추가하기...`선택한다.
+메뉴에서 `스케치` - `내부 라이브러리...` - `라이브러리 추가하기...`선택한다.
 
-`minim`을 검색해서 설치한다. 
+`minim`을 검색해서 설치한다.
 
 ### 메인
 
@@ -91,7 +91,7 @@ def setup():
     for n in range(0, 10):
         items.append(Item())
     size(600, 400)
-    
+
 def draw():
     background(255)
     global player
@@ -105,7 +105,7 @@ def draw():
         textAlign(CENTER)
         text("Failed", width/2, height/2)
         return
-    
+
     player.update()
     player.display()
     global sound
@@ -114,7 +114,7 @@ def draw():
         item.update(player, sound)
         item.display()
     drawLife()
-    
+
 def drawLife():
     fill(0)
     textSize(30)
@@ -146,7 +146,7 @@ import random
 class Item:
     def __init__(self):        
         self.reset()
-    
+
     def reset(self):
         x = random.randrange(0, width)
         y = random.randrange(50, height)
@@ -155,10 +155,10 @@ class Item:
         self.pos = PVector(x, -y)
         self.velocity = v
         self.mode = m
-        
+
     def update(self, player, sound):
         self.pos.y = self.pos.y + self.velocity
-        
+
         if dist(player.pos.x, player.pos.y, self.pos.x, self.pos.y) < 37.5:
             sound.rewind()
             sound.play()
@@ -210,3 +210,141 @@ with urllib.request.urlopen('https://query.yahooapis.com/v1/public/yql?q=select%
 ```
 
 `json` 모듈을 추가해 파이썬에서 json을 제어할 수 있다.
+
+## 페이스북 챗봇 만들기
+
+터미널에서 다음을 입력해 `flask`와 `pymessenger`를 설치한다. 
+
+```
+pip install Flask==0.12.2
+pip install pymessenger==0.0.7.0
+```
+
+다음과 같이 코드를 입력한다.
+
+```python
+from flask import Flask, request
+
+app = Flask(__name__)
+@app.route('/', methods=['GET', 'POST'])
+def receive_message():
+    return "Hello World!"
+
+if __name__ == '__main__':
+    app.run()
+```
+
+터미널에서 다음과 같이 입력하면 서버가 실행된다.
+
+```
+python app.py
+```
+
+[ngrok](https://ngrok.com/)에 가입한다.
+
+`ngrok`을 설치한다.
+
+터미널에서 아래와 같이 실행한다. 여기서 `AUTHTOKEN`은 자신의 `ngrok` 토큰이다.
+
+```
+./ngrok authtoken AUTHTOKEN
+```
+
+터미널에서 다음과 같이 입력하면 외부에서 로컬에 실행하는 서버에 접속할 수 있다. 여기서 `PORT`는 로컬에서 실행하는 포트 주소다.
+
+```
+./ngrok http PORT
+```
+
+코드를 다음과 같이 수정한다.
+
+```python
+import random
+from flask import Flask, request
+from pymessenger.bot import Bot
+
+hi_words = ['안녕', '안녕하세요', '어? 왔니? 혼자야?', '오랜만이에요!']
+
+app = Flask(__name__)
+ACCESS_TOKEN = 'ACCESS_TOKEN'
+VERIFY_TOKEN = 'VERIFY_TOKEN'
+bot = Bot(ACCESS_TOKEN)
+
+@app.route("/", methods=['GET', 'POST'])
+def receive_message():
+    if request.method == 'GET':
+        token_sent = request.args.get("hub.verify_token")
+        return verify_fb_token(token_sent)
+    else:
+        output = request.get_json()
+        for event in output['entry']:
+            messaging = event['messaging']
+            for message in messaging:
+                if message.get('message'):
+                    recipient_id = message['sender']['id']
+                    if message['message'].get('text'):
+                        print('text message')
+                        text = message['message']['text']
+                        if '안녕' in text:
+                            msg = random.choice(hi_words)
+                            send_message(recipient_id, msg)
+                    if message['message'].get('attachments'):
+                        print('attachments')
+    return "Message Processed"
+
+def verify_fb_token(token_sent):
+    if token_sent == VERIFY_TOKEN:
+        return request.args.get("hub.challenge")
+    return 'Invalid verification token'
+
+def send_message(recipient_id, response):
+    bot.send_text_message(recipient_id, response)
+    return "success"
+
+if __name__ == "__main__":
+    app.run()
+```
+
+[developers.facebook.com](https://developers.facebook.com/)에 로그인 한다. 
+
+`새 앱 추가`를 누른다.
+
+![day8_00](img/day8_00.jpg)
+
+`표시 이름`에 원하는 이름을 입력한다.
+
+![day8_01](img/day8_01.jpg)
+
+Messenger의 설정을 누른다.
+
+![day8_02](img/day8_02.jpg)
+
+
+
+페이지 선택에서 챗봇을 적용할 페이지를 선택한다.
+
+![day8_03](img/day8_03.jpg)
+
+페이지 액세스 토큰을 코드에 `ACCESS_TOKEN`에 입력한다.
+
+![day8_04](img/day8_04.jpg)
+
+[passwordsgenerator.net](http://passwordsgenerator.net/)에서 랜덤 문자를 생성해서 `VERIFY_TOKEN`에 입력한다.
+
+ngrok과 함께 서버를 실행한다.
+
+`Webhooks 설정`을 클릭한다.
+
+![day8_05](img/day8_05.jpg)
+
+다음과 같이 입력한다.
+
+![day8_06](img/day8_06.jpg)
+
+위에서 선택한 페이지를 선택한다.
+
+![day8_07](img/day8_07.jpg)
+
+`받아보기`를 클릭한다.
+
+![day8_08](img/day8_08.jpg)
